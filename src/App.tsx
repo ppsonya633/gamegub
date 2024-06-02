@@ -1,35 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { HStack, Show } from "@chakra-ui/react";
+import { Grid, GridItem } from "@chakra-ui/react";
+import Navbar from "./components/Navbar";
+import { useState } from "react";
+// import GameGrid from "./components/GameGrid";
+import GameGrid from "./components/GameGrid";
+import { Genre } from "./hooks/useGeneres";
+import GenereCard from "./components/GenreList";
+import PlatformSelector from "./components/PlatformSelector";
+import { Platform } from "./hooks/useGame";
+import SortSelector from "./components/SortSelector";
+import GameHeading from "./components/GameHeading";
+import TodoList from "./Todos/TodoList";
+import PostList from "./Todos/PostList";
+import TodoForm from "./Todos/TodoForm";
 
-function App() {
-  const [count, setCount] = useState(0)
+export type GameQuery = {
+  genre: Genre | null;
+  platform: Platform | null;
+  searchText: string;
+};
+const App = () => {
+  const [gameQuery, setgameQuery] = useState<GameQuery>({} as GameQuery);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Grid
+      templateAreas={{
+        base: `"nav" "main"`,
+        lg: `"nav nav" "aside main"`,
+      }}
+    >
+      <GridItem area="nav">
+        <Navbar
+          onSearch={(searchText) => setgameQuery({ ...gameQuery, searchText })}
+        ></Navbar>
+      </GridItem>
+      <Show above="lg">
+        <GridItem area="aside" paddingX={5} marginTop={5}>
+          <GenereCard
+            onSelectGenre={(genre) => setgameQuery({ ...gameQuery, genre })}
+            selectedGenre={gameQuery.genre}
 
-export default App
+          ></GenereCard>
+        </GridItem>
+      </Show>
+      <GridItem area="main">
+        <GameHeading getQuery={gameQuery}></GameHeading>
+        <HStack spacing={5} paddingLeft={2} marginBottom={5} marginTop={5}>
+          <PlatformSelector
+            selectedPlatform={gameQuery.platform}
+            onselectedPlatform={(platform) =>
+              setgameQuery({ ...gameQuery, platform })
+            }
+          ></PlatformSelector>
+          <SortSelector></SortSelector>
+        </HStack>
+        <GameGrid gameQuery={gameQuery}></GameGrid>
+      </GridItem>
+    </Grid>
+  );
+
+  // React course Part 2 Started Here...
+  // return <PostList></PostList>;
+  // return (
+  //   <>
+  //     <TodoForm></TodoForm>
+  //     <TodoList></TodoList>
+  //   </>
+  // );
+};
+
+export default App;
